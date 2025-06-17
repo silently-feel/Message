@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emoji Text Encryption & Decryption Tool</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <!-- AOS Animation Library -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    :root {
+      --primary-color: #3a0ca3;
+      --secondary-color: #4cc9f0;
+      --accent-color: #f72585;
+      --dark-color: #1a1a2e;
+      --light-color: #f8f9fa;
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--dark-color) 0%, #2d3047 100%);
+      color: var(--light-color);
+      font-family: 'Montserrat', sans-serif;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    h1, h2 {
+      font-family: 'Orbitron', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    h1 {
+      color: var(--secondary-color);
+      text-shadow: 0 0 10px rgba(76, 201, 240, 0.6);
+      margin-bottom: 1.5rem;
+    }
+    
+    h2 {
+      color: var(--accent-color);
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background-color: var(--accent-color);
+      transition: width 0.3s ease;
+    }
+    
+    .section-heading:hover::after {
+      width: 100px;
+    }
+    
+    .mode-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 10px 25px;
+      margin: 0 5px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .mode-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+      background: var(--secondary-color);
+    }
+    
+    .mode-btn.active {
+      background: var(--accent-color);
+    }
+    
+    textarea, input {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      color: white !important;
+      border-radius: 10px !important;
+      transition: all 0.3s ease !important;
+      backdrop-filter: blur(5px);
+    }
+    
+    textarea:focus, input:focus {
+      background-color: rgba(255, 255, 255, 0.15) !important;
+      border-color: var(--secondary-color) !important;
+      box-shadow: 0 0 15px rgba(76, 201, 240, 0.5) !important;
+    }
+    
+    textarea {
+      resize: none;
+      min-height: 120px;
+    }
+    
+    label {
+      color: var(--secondary-color);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    
+    .btn-success {
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: 30px;
+      padding: 10px 25px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-success:hover {
+      background-color: #4361ee;
+      transform: translateY(-3px);
+      box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn-info {
+      background-color: var(--secondary-color);
+      color: var(--dark-color);
+      border: none;
+      border-radius: 30px;
+      padding: 10px 25px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-info:hover {
+      background-color: #90e0ef;
+      transform: translateY(-3px);
+      box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .output {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      border-left: 4px solid var(--accent-color);
+      backdrop-filter: blur(5px);
+      overflow-wrap: break-word;
+    }
+    
+    .output:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .message {
+      margin-top: 10px;
+      color: #4ade80;
+      font-weight: bold;
+      display: none;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+      background-color: rgba(74, 222, 128, 0.2);
+      animation: fadeInOut 2s ease-in-out;
+    }
+    
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    
+    .hidden-textarea {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+    }
+    
+    .card {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+    
+    .glow-effect {
+      text-shadow: 0 0 10px currentColor;
+    }
+    
+    /* Loading animation */
+    .loading {
+      display: none;
+      margin: 15px auto;
+      position: relative;
+      width: 50px;
+      height: 50px;
+    }
+    
+    .loading:before {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: var(--secondary-color);
+      border-bottom-color: var(--accent-color);
+      width: 100%;
+      height: 100%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .text-center p {
+      color: white;
+    }
+    
+    /* Modal styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background-color: rgba(42, 43, 56, 0.95);
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+      padding: 30px;
+      width: 350px;
+      max-width: 90%;
+      border: 1px solid var(--secondary-color);
+      animation: modalFadeIn 0.3s ease;
+    }
+    
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-header h3 {
+      color: var(--secondary-color);
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+    }
+    
+    .modal-body {
+      margin-bottom: 20px;
+    }
+    
+    .pin-attempt-message {
+      color: #f87171;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container mt-4">
+    <div class="text-center mb-4" data-aos="fade-down">
+      <h1>Emoji Text Encryption & Decryption</h1>
+      <p class="lead glow-effect">Secure your messages with fun emoji encryption</p>
+    </div>
+    
+    <div class="text-center mb-5" data-aos="fade-up">
+      <button id="encryptBtn" class="mode-btn active">Encrypt</button>
+      <button id="decryptBtn" class="mode-btn">Decrypt</button>
+    </div>
+
+    <!-- Hidden textarea for copying -->
+    <textarea id="hiddenTextarea" class="hidden-textarea"></textarea>
+
+    <!-- Encrypt Section -->
+    <div id="encryptSection" class="card" data-aos="fade-right">
+      <h2 class="section-heading">Encrypt Message</h2>
+      <div class="mb-3">
+        <label for="encryptMessage" class="form-label">Enter your message:</label>
+        <textarea id="encryptMessage" class="form-control" rows="4" placeholder="Type your secret message here..."></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="encryptPin" class="form-label">Enter a 4-digit pin:</label>
+        <input type="text" id="encryptPin" class="form-control" maxlength="4" placeholder="1234">
+      </div>
+      <div class="d-flex flex-wrap">
+        <button id="encryptSubmit" class="btn btn-success me-2 mb-2">
+          <span>Encrypt</span>
+        </button>
+        <button id="encryptCopyBtn" class="btn btn-info mb-2">
+          <span>Copy Encrypted Message</span>
+        </button>
+      </div>
+      <div id="loading-encrypt" class="loading"></div>
+      <p id="copyMessage" class="message">Text copied to clipboard! 🎉</p> <!-- Success Message -->
+      <div id="encryptOutput" class="output mt-3" style="display: none;"></div>
+    </div>
+
+    <!-- Decrypt Section -->
+    <div id="decryptSection" class="card" style="display: none;" data-aos="fade-left">
+      <h2 class="section-heading">Decrypt Message</h2>
+      <div class="mb-3">
+        <label for="decryptMessage" class="form-label">Paste the encrypted message:</label>
+        <textarea id="decryptMessage" class="form-control" rows="4" placeholder="Paste your encrypted emoji message here..."></textarea>
+      </div>
+      <button id="decryptSubmit" class="btn btn-success">Decrypt</button>
+      <div id="loading-decrypt" class="loading"></div>
+      <div id="decryptOutput" class="output mt-3" style="display: none;"></div>
+    </div>
+    
+    <!-- PIN Entry Modal -->
+    <div id="pinModal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Enter PIN</h3>
+        </div>
+        <div class="modal-body">
+          <label for="modalDecryptPin" class="form-label">Enter the 4-digit pin:</label>
+          <input type="text" id="modalDecryptPin" class="form-control" maxlength="4" placeholder="1234">
+          <p id="pinAttemptMessage" class="pin-attempt-message">Incorrect PIN. 2 attempts remaining.</p>
+        </div>
+        <div class="text-center">
+          <button id="submitPinBtn" class="btn btn-success">Submit</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4 text-muted" data-aos="fade-up">
+      <p>Secure your messages with emoji encryption 🔒 by Silent_Coder</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    // Initialize AOS animation library
+    AOS.init({
+      duration: 1000,
+      once: false
+    });
+    
+    // Updated Emoji Mappings with unique emojis for each character
+    const charToEmoji = {
+      'a': '🍎', 'b': '🍌', 'c': '🍪', 'd': '🍩', 'e': '🥚', 'f': '🍟', 'g': '🍇', 'h': '🍯',
+      'i': '🍦', 'j': '🧃', 'k': '🥝', 'l': '🍋', 'm': '🍄', 'n': '🥜', 'o': '🍊', 'p': '🍐',
+      'q': '🧀', 'r': '🍓', 's': '🍰', 't': '🍅', 'u': '☂️', 'v': '🍆', 'w': '🌊', 'x': '⚔️',
+      'y': '🧶', 'z': '⚡', '0': '🔢', '1': '🥇', '2': '🥈', '3': '🥉', '4': '🏆',
+      '5': '🖐️', '6': '🎰', '7': '🎲', '8': '⏰', '9': '🎯', ' ': '⬜', '.': '🔵',
+      ',': '🟢', '?': '❓', '!': '❗', '@': '📧', '#': '🔲', '$': '💲', '%': '💯',
+      '^': '🔼', '&': '🔠', '*': '⭐', '(': '↪️', ')': '↩️', '-': '➖', '_': '⬛',
+      '+': '➕', '=': '⏸️', '{': '📂', '}': '📁', '[': '【', ']': '】', '|': '⏐',
+      '\\': '↘️', '/': '↙️', '<': '⬅️', '>': '➡️', ':': '⏱️', ';': '⏲️', '"': '🔤',
+      "'": '🔡', '`': '🔃', '~': '〰️'
+    };
+
+    // Create reverse mapping for decryption
+    const emojiToChar = {};
+    for (const char in charToEmoji) {
+      emojiToChar[charToEmoji[char]] = char;
+    }
+
+    // Updated PIN to Emoji mapping
+    const pinToEmoji = {
+      '0': '🌑', '1': '🌘', '2': '🌗', '3': '🌖', '4': '🌕',
+      '5': '🌔', '6': '🌓', '7': '🌒', '8': '🌙', '9': '☀️'
+    };
+
+    // Create reverse mapping for PIN decryption
+    const emojiToPin = {};
+    for (const digit in pinToEmoji) {
+      emojiToPin[pinToEmoji[digit]] = digit;
+    }
+
+    // DOM Elements
+    const encryptSection = document.getElementById('encryptSection');
+    const decryptSection = document.getElementById('decryptSection');
+    const encryptBtn = document.getElementById('encryptBtn');
+    const decryptBtn = document.getElementById('decryptBtn');
+    const encryptSubmit = document.getElementById('encryptSubmit');
+    const decryptSubmit = document.getElementById('decryptSubmit');
+    const encryptOutput = document.getElementById('encryptOutput');
+    const decryptOutput = document.getElementById('decryptOutput');
+    const encryptCopyBtn = document.getElementById('encryptCopyBtn');
+    const copyMessage = document.getElementById('copyMessage');
+    const hiddenTextarea = document.getElementById('hiddenTextarea');
+    const loadingEncrypt = document.getElementById('loading-encrypt');
+    const loadingDecrypt = document.getElementById('loading-decrypt');
+    const pinModal = document.getElementById('pinModal');
+    const modalDecryptPin = document.getElementById('modalDecryptPin');
+    const submitPinBtn = document.getElementById('submitPinBtn');
+    const pinAttemptMessage = document.getElementById('pinAttemptMessage');
+    
+    // Tracking PIN attempts
+    let pinAttempts = 0;
+    let currentEncryptedMessage = "";
+    
+    // Function to clear all form fields when switching modes
+    function clearAllFields() {
+      document.getElementById('encryptMessage').value = '';
+      document.getElementById('encryptPin').value = '';
+      document.getElementById('decryptMessage').value = '';
+      modalDecryptPin.value = '';
+      encryptOutput.style.display = 'none';
+      decryptOutput.style.display = 'none';
+      hiddenTextarea.value = ''; 
+      pinAttempts = 0;
+      pinAttemptMessage.style.display = 'none';
+    }
+
+    // Reset page function (for when PIN attempts exceed limit)
+    function resetPage() {
+      clearAllFields();
+      // Show a brief message about resetting due to too many attempts
+      decryptOutput.innerHTML = '❌ <strong>Too many incorrect PIN attempts. Page has been reset.</strong>';
+      decryptOutput.style.display = 'block';
+      gsap.from(decryptOutput, { opacity: 0, y: 10, duration: 0.3 });
+      
+      // Hide the message after 3 seconds
+      setTimeout(() => {
+        decryptOutput.style.display = 'none';
+      }, 3000);
+    }
+
+    // Switch between Encrypt and Decrypt modes
+    encryptBtn.addEventListener('click', () => {
+      clearAllFields(); 
+      encryptSection.style.display = 'block';
+      decryptSection.style.display = 'none';
+      encryptBtn.classList.add('active');
+      decryptBtn.classList.remove('active');
+      gsap.from(encryptSection, { opacity: 0, y: 20, duration: 0.5 });
+    });
+
+    decryptBtn.addEventListener('click', () => {
+      clearAllFields(); 
+      encryptSection.style.display = 'none';
+      decryptSection.style.display = 'block';
+      encryptBtn.classList.remove('active');
+      decryptBtn.classList.add('active');
+      gsap.from(decryptSection, { opacity: 0, y: 20, duration: 0.5 });
+    });
+    
+    // Function to detect emoji in text
+function containsEmoji(text) {
+  const emojiRegex = /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|[0-9]\uFE0F\u20E3|[\u2600-\u27BF])/gu;
+  return emojiRegex.test(text);
+}
+
+// Add this event listener to the encrypt message input
+document.getElementById('encryptMessage').addEventListener('input', function() {
+  if (containsEmoji(this.value)) {
+    encryptOutput.textContent = '❌ Please enter only text or numbers for encryption. Emojis are not allowed in the input.';
+    encryptOutput.style.display = 'block';
+    gsap.from(encryptOutput, { opacity: 0, y: 10, duration: 0.3 });
+    // Clear the emoji from the input
+    this.value = this.value.replace(/(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|[0-9]\uFE0F\u20E3|[\u2600-\u27BF])/gu, '');
+  } else if (encryptOutput.textContent.includes('Emojis are not allowed')) {
+    // Clear the error message if input is now valid
+    encryptOutput.style.display = 'none';
+  }
+});
+
+    // Function to validate PIN (must be 4 digits)
+    function validatePin(pin) {
+      return /^\d{4}$/.test(pin);
+    }
+
+    // Function to encrypt a message
+    function encryptText(text, pin) {
+      let encryptedText = '';
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i].toLowerCase();
+        encryptedText += charToEmoji[char] || char;
+      }
+
+      let emojiPin = '';
+      for (let i = 0; i < pin.length; i++) {
+        emojiPin += pinToEmoji[pin[i]];
+      }
+
+      return encryptedText + emojiPin;
+    }
+
+    // Function to decrypt a message
+    function decryptText(encryptedMessage, pin) {
+      let emojiPin = '';
+      for (let i = 0; i < pin.length; i++) {
+        emojiPin += pinToEmoji[pin[i]];
+      }
+
+      if (!encryptedMessage.endsWith(emojiPin)) {
+        return false;
+      }
+
+      const messageWithoutPin = encryptedMessage.slice(0, -emojiPin.length);
+      const emojis = messageWithoutPin.match(/(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|[0-9]\uFE0F\u20E3|[\u2600-\u27BF])/gu) || [];
+      
+      let decryptedText = '';
+      for (const emoji of emojis) {
+        decryptedText += emojiToChar[emoji] || emoji;
+      }
+
+      return decryptedText;
+    }
+
+    // Encrypt Button Click Handler
+    encryptSubmit.addEventListener('click', () => {
+      const message = document.getElementById('encryptMessage').value;
+      const pin = document.getElementById('encryptPin').value;
+
+      if (!message) {
+        encryptOutput.textContent = '❌ Please enter a message to encrypt.';
+        encryptOutput.style.display = 'block';
+        gsap.from(encryptOutput, { opacity: 0, y: 10, duration: 0.3 });
+        return;
+      }
+
+      if (!validatePin(pin)) {
+        encryptOutput.textContent = '❌ Please enter a valid 4-digit PIN.';
+        encryptOutput.style.display = 'block';
+        gsap.from(encryptOutput, { opacity: 0, y: 10, duration: 0.3 });
+        return;
+      }
+
+      // Show loading animation
+      loadingEncrypt.style.display = 'block';
+      encryptOutput.style.display = 'none';
+      
+      // Simulate processing time for animation effect
+      setTimeout(() => {
+        const encrypted = encryptText(message, pin);
+        encryptOutput.innerHTML = '<strong>Encrypted Message:</strong><br>' + encrypted;
+        
+        // Store the raw encrypted text (without label) for copying
+        hiddenTextarea.value = encrypted;
+        
+        // Hide loading, show output
+        loadingEncrypt.style.display = 'none';
+        encryptOutput.style.display = 'block';
+        
+        // Animate the output appearance
+        gsap.from(encryptOutput, { opacity: 0, y: 10, duration: 0.5 });
+      }, 800);
+    });
+
+    // Function to copy text using the execCommand method
+    function copyText() {
+      // Select the text in the hidden textarea
+      hiddenTextarea.select();
+      hiddenTextarea.setSelectionRange(0, 99999); // For mobile devices
+      
+      // Execute the copy command
+      document.execCommand('copy');
+      
+      // Show success message
+      copyMessage.style.display = 'block';
+      
+      // Hide message after animation completes
+      setTimeout(function() {
+        copyMessage.style.display = 'none';
+      }, 2000);
+    }
+
+    // Updated Copy Button Click Handler
+    encryptCopyBtn.addEventListener('click', () => {
+      // Check if the hiddenTextarea has any content
+      if (!hiddenTextarea.value.trim()) {
+        // Show message that there's nothing to copy
+        encryptOutput.textContent = '❌ Please encrypt a message first.';
+        encryptOutput.style.display = 'block';
+        gsap.from(encryptOutput, { opacity: 0, y: 10, duration: 0.3 });
+        return;
+      }
+      
+      // If there is content, proceed with the copy
+      copyText();
+    });
+
+    // Show PIN modal when decrypt button is clicked
+    decryptSubmit.addEventListener('click', () => {
+      const encryptedMessage = document.getElementById('decryptMessage').value;
+
+      if (!encryptedMessage) {
+        decryptOutput.textContent = '❌ Please enter a message to decrypt.';
+        decryptOutput.style.display = 'block';
+        gsap.from(decryptOutput, { opacity: 0, y: 10, duration: 0.3 });
+        return;
+      }
+      
+      // Store the encrypted message
+      currentEncryptedMessage = encryptedMessage;
+      
+      // Reset PIN input and attempts for new decryption
+      modalDecryptPin.value = '';
+      pinAttempts = 0;
+      pinAttemptMessage.style.display = 'none';
+      
+      // Show the PIN modal
+      pinModal.style.display = 'flex';
+      
+      // Focus on the PIN input
+      setTimeout(() => {
+        modalDecryptPin.focus();
+      }, 300);
+    });
+    
+    // Handle PIN submission
+    submitPinBtn.addEventListener('click', () => {
+      const pin = modalDecryptPin.value;
+      
+      if (!validatePin(pin)) {
+        pinAttemptMessage.textContent = '❌ Please enter a valid 4-digit PIN.';
+        pinAttemptMessage.style.display = 'block';
+        return;
+      }
+      
+      // Hide the modal
+      pinModal.style.display = 'none';
+      
+      // Show loading animation
+      loadingDecrypt.style.display = 'block';
+      decryptOutput.style.display = 'none';
+      
+      // Simulate processing time for animation effect
+      setTimeout(() => {
+        const decrypted = decryptText(currentEncryptedMessage, pin);
+        
+        if (decrypted === false) {
+          // Increment attempt counter
+          pinAttempts++;
+          
+          if (pinAttempts >= 3) {
+            // Reset the page after 3 incorrect attempts
+            resetPage();
+          } else {
+            // Show error and allow another attempt
+            decryptOutput.innerHTML = `❌ <strong>Incorrect PIN. ${3 - pinAttempts} attempts remaining.</strong>`;
+            decryptOutput.style.display = 'block';
+            gsap.from(decryptOutput, { opacity: 0, y: 10, duration: 0.3 });
+            
+            // Show the PIN modal again after a brief delay
+            setTimeout(() => {
+              pinAttemptMessage.textContent = `Incorrect PIN. ${3 - pinAttempts} attempts remaining.`;
+              pinAttemptMessage.style.display = 'block';
+              pinModal.style.display = 'flex';
+              modalDecryptPin.value = '';
+              modalDecryptPin.focus();
+            }, 1500);
+          }
+        } else {
+          // Successful decryption
+          decryptOutput.innerHTML = '<strong>Decrypted Message:</strong><br>' + decrypted;
+          decryptOutput.style.display = 'block';
+          gsap.from(decryptOutput, { opacity: 0, y: 10, duration: 0.3 });
+          
+          // Reset attempt counter on success
+          pinAttempts = 0;
+        }
+        
+        // Hide loading
+        loadingDecrypt.style.display = 'none';
+      }, 800);
+    });
+    
+    // Close modal if user clicks outside the modal content
+    pinModal.addEventListener('click', (e) => {
+      if (e.target === pinModal) {
+        pinModal.style.display = 'none';
+      }
+    });
+    
+    // Allow Enter key to submit the PIN
+    modalDecryptPin.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        submitPinBtn.click();
+      }
+    });
+
+    // Add input validation visual cues
+    document.getElementById('encryptPin').addEventListener('input', function() {
+      if (validatePin(this.value)) {
+        this.style.borderColor = '#4ade80';
+      } else {
+        this.style.borderColor = this.value.length > 0 ? '#f87171' : '';
+      }
+    });
+
+    modalDecryptPin.addEventListener('input', function() {
+      if (validatePin(this.value)) {
+        this.style.borderColor = '#4ade80';
+      } else {
+        this.style.borderColor = this.value.length > 0 ? '#f87171' : '';
+      }
+    });
+  </script>
+</body>
+</html>
